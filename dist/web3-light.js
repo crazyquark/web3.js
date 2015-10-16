@@ -1867,7 +1867,7 @@ module.exports = function (value, options) {
 };
 
 
-},{"crypto-js":55,"crypto-js/sha3":76}],20:[function(require,module,exports){
+},{"crypto-js":56,"crypto-js/sha3":77}],20:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -2395,7 +2395,7 @@ module.exports = {
     isJson: isJson
 };
 
-},{"bignumber.js":"bignumber.js","utf8":81}],21:[function(require,module,exports){
+},{"bignumber.js":"bignumber.js","utf8":82}],21:[function(require,module,exports){
 module.exports={
     "version": "0.13.0"
 }
@@ -2430,6 +2430,7 @@ module.exports={
 var version = require('./version.json');
 var net = require('./web3/methods/net');
 var eth = require('./web3/methods/eth');
+var personal = require('./web3/methods/personal');
 var db = require('./web3/methods/db');
 var shh = require('./web3/methods/shh');
 var watches = require('./web3/methods/watches');
@@ -2580,6 +2581,7 @@ web3._extend.utils = utils;
 web3._extend.Method = require('./web3/method');
 web3._extend.Property = require('./web3/property');
 
+web3.personal = {};
 
 /// setups all api methods
 setupProperties(web3, web3Properties);
@@ -2589,11 +2591,12 @@ setupMethods(web3.eth, eth.methods);
 setupProperties(web3.eth, eth.properties);
 setupMethods(web3.db, db.methods);
 setupMethods(web3.shh, shh.methods);
+setupMethods(web3.personal, personal.methods);
 
 module.exports = web3;
 
 
-},{"./utils/config":18,"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/filter":28,"./web3/formatters":29,"./web3/iban":32,"./web3/method":35,"./web3/methods/db":36,"./web3/methods/eth":37,"./web3/methods/net":38,"./web3/methods/shh":39,"./web3/methods/watches":40,"./web3/property":42,"./web3/requestmanager":43,"./web3/syncing":44}],23:[function(require,module,exports){
+},{"./utils/config":18,"./utils/sha3":19,"./utils/utils":20,"./version.json":21,"./web3/batch":24,"./web3/filter":28,"./web3/formatters":29,"./web3/iban":32,"./web3/method":35,"./web3/methods/db":36,"./web3/methods/eth":37,"./web3/methods/net":38,"./web3/methods/personal":39,"./web3/methods/shh":40,"./web3/methods/watches":41,"./web3/property":43,"./web3/requestmanager":44,"./web3/syncing":45}],23:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -2682,7 +2685,7 @@ AllSolidityEvents.prototype.attachToContract = function (contract) {
 module.exports = AllSolidityEvents;
 
 
-},{"../utils/sha3":19,"../utils/utils":20,"./event":27,"./filter":28,"./formatters":29,"./methods/watches":40}],24:[function(require,module,exports){
+},{"../utils/sha3":19,"../utils/utils":20,"./event":27,"./filter":28,"./formatters":29,"./methods/watches":41}],24:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -2750,7 +2753,7 @@ Batch.prototype.execute = function () {
 module.exports = Batch;
 
 
-},{"./errors":26,"./jsonrpc":34,"./requestmanager":43}],25:[function(require,module,exports){
+},{"./errors":26,"./jsonrpc":34,"./requestmanager":44}],25:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -3278,7 +3281,7 @@ SolidityEvent.prototype.attachToContract = function (contract) {
 module.exports = SolidityEvent;
 
 
-},{"../solidity/coder":7,"../utils/sha3":19,"../utils/utils":20,"./filter":28,"./formatters":29,"./methods/watches":40}],28:[function(require,module,exports){
+},{"../solidity/coder":7,"../utils/sha3":19,"../utils/utils":20,"./filter":28,"./formatters":29,"./methods/watches":41}],28:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -3509,7 +3512,7 @@ Filter.prototype.get = function (callback) {
 module.exports = Filter;
 
 
-},{"../utils/utils":20,"./formatters":29,"./requestmanager":43}],29:[function(require,module,exports){
+},{"../utils/utils":20,"./formatters":29,"./requestmanager":44}],29:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -4910,7 +4913,7 @@ Method.prototype.send = function () {
 module.exports = Method;
 
 
-},{"../utils/utils":20,"./errors":26,"./requestmanager":43}],36:[function(require,module,exports){
+},{"../utils/utils":20,"./errors":26,"./requestmanager":44}],36:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5266,7 +5269,7 @@ module.exports = {
 };
 
 
-},{"../../utils/utils":20,"../formatters":29,"../method":35,"../property":42}],38:[function(require,module,exports){
+},{"../../utils/utils":20,"../formatters":29,"../method":35,"../property":43}],38:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5316,7 +5319,84 @@ module.exports = {
 };
 
 
-},{"../../utils/utils":20,"../property":42}],39:[function(require,module,exports){
+},{"../../utils/utils":20,"../property":43}],39:[function(require,module,exports){
+/*
+    This file is part of ethereum.js.
+
+    ethereum.js is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ethereum.js is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with ethereum.js.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * @file personal.js
+ * @author Marek Kotewicz <marek@ethdev.com>
+ * @author Fabian Vogelsteller <fabian@ethdev.com>
+ * @author Andrei Grigoriu <mudpedal@vertexarmy.org> (this file)
+ * @date 2015
+ */
+
+/**
+ * Web3
+ *
+ * @module web3
+ */
+
+/**
+ * Personal methods and properties
+ * @class [web3] personal
+ * @constructor
+ */
+
+"use strict";
+
+var formatters = require('../formatters');
+var utils = require('../../utils/utils');
+var Method = require('../method');
+
+/// @returns an array of objects describing web3.personal api methods
+
+var getAccountPrivateKey = new Method({
+    name: 'getAccountPrivateKey',
+    call: 'personal_getAccountPrivateKey',
+    params: 2, 
+    inputFormatter: [formatters.inputAddressFormatter, null],
+});
+
+var unlockAccount = new Method({
+    name: 'unlockAccount',
+    call: 'personal_unlockAccount',
+    params: 3, 
+    inputFormatter: [formatters.inputAddressFormatter, null, null],
+});
+
+var newAccount = new Method({
+    name: 'newAccount',
+    call: 'personal_newAccount',
+    params: 1, 
+});
+
+var methods = [
+    getAccountPrivateKey,
+    unlockAccount,
+    newAccount
+];
+
+/// @returns an array of objects describing web3.personal api properties
+module.exports = {
+    methods: methods
+};
+
+
+},{"../../utils/utils":20,"../formatters":29,"../method":35}],40:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5386,7 +5466,7 @@ module.exports = {
 };
 
 
-},{"../formatters":29,"../method":35}],40:[function(require,module,exports){
+},{"../formatters":29,"../method":35}],41:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5502,7 +5582,7 @@ module.exports = {
 };
 
 
-},{"../method":35}],41:[function(require,module,exports){
+},{"../method":35}],42:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5538,7 +5618,7 @@ module.exports = {
 };
 
 
-},{"../contracts/GlobalRegistrar.json":1,"../contracts/ICAPRegistrar.json":2,"./contract":25}],42:[function(require,module,exports){
+},{"../contracts/GlobalRegistrar.json":1,"../contracts/ICAPRegistrar.json":2,"./contract":25}],43:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5690,7 +5770,7 @@ Property.prototype.request = function () {
 module.exports = Property;
 
 
-},{"../utils/utils":20,"./requestmanager":43}],43:[function(require,module,exports){
+},{"../utils/utils":20,"./requestmanager":44}],44:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -5963,7 +6043,7 @@ RequestManager.prototype.poll = function () {
 module.exports = RequestManager;
 
 
-},{"../utils/config":18,"../utils/utils":20,"./errors":26,"./jsonrpc":34}],44:[function(require,module,exports){
+},{"../utils/config":18,"../utils/utils":20,"./errors":26,"./jsonrpc":34}],45:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -6066,7 +6146,7 @@ IsSyncing.prototype.stopWatching = function () {
 module.exports = IsSyncing;
 
 
-},{"../utils/utils":20,"./formatters":29,"./method":35,"./requestmanager":43}],45:[function(require,module,exports){
+},{"../utils/utils":20,"./formatters":29,"./method":35,"./requestmanager":44}],46:[function(require,module,exports){
 /*
     This file is part of ethereum.js.
 
@@ -6163,9 +6243,9 @@ var deposit = function (from, to, value, client, callback) {
 module.exports = transfer;
 
 
-},{"../contracts/SmartExchange.json":3,"../web3":22,"./contract":25,"./iban":32,"./namereg":41}],46:[function(require,module,exports){
+},{"../contracts/SmartExchange.json":3,"../web3":22,"./contract":25,"./iban":32,"./namereg":42}],47:[function(require,module,exports){
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -6393,7 +6473,7 @@ module.exports = transfer;
 	return CryptoJS.AES;
 
 }));
-},{"./cipher-core":48,"./core":49,"./enc-base64":50,"./evpkdf":52,"./md5":57}],48:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50,"./enc-base64":51,"./evpkdf":53,"./md5":58}],49:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -7269,7 +7349,7 @@ module.exports = transfer;
 
 
 }));
-},{"./core":49}],49:[function(require,module,exports){
+},{"./core":50}],50:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8012,7 +8092,7 @@ module.exports = transfer;
 	return CryptoJS;
 
 }));
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8136,7 +8216,7 @@ module.exports = transfer;
 	return CryptoJS.enc.Base64;
 
 }));
-},{"./core":49}],51:[function(require,module,exports){
+},{"./core":50}],52:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8286,7 +8366,7 @@ module.exports = transfer;
 	return CryptoJS.enc.Utf16;
 
 }));
-},{"./core":49}],52:[function(require,module,exports){
+},{"./core":50}],53:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8419,7 +8499,7 @@ module.exports = transfer;
 	return CryptoJS.EvpKDF;
 
 }));
-},{"./core":49,"./hmac":54,"./sha1":73}],53:[function(require,module,exports){
+},{"./core":50,"./hmac":55,"./sha1":74}],54:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8486,7 +8566,7 @@ module.exports = transfer;
 	return CryptoJS.format.Hex;
 
 }));
-},{"./cipher-core":48,"./core":49}],54:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],55:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8630,7 +8710,7 @@ module.exports = transfer;
 
 
 }));
-},{"./core":49}],55:[function(require,module,exports){
+},{"./core":50}],56:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8649,7 +8729,7 @@ module.exports = transfer;
 	return CryptoJS;
 
 }));
-},{"./aes":47,"./cipher-core":48,"./core":49,"./enc-base64":50,"./enc-utf16":51,"./evpkdf":52,"./format-hex":53,"./hmac":54,"./lib-typedarrays":56,"./md5":57,"./mode-cfb":58,"./mode-ctr":60,"./mode-ctr-gladman":59,"./mode-ecb":61,"./mode-ofb":62,"./pad-ansix923":63,"./pad-iso10126":64,"./pad-iso97971":65,"./pad-nopadding":66,"./pad-zeropadding":67,"./pbkdf2":68,"./rabbit":70,"./rabbit-legacy":69,"./rc4":71,"./ripemd160":72,"./sha1":73,"./sha224":74,"./sha256":75,"./sha3":76,"./sha384":77,"./sha512":78,"./tripledes":79,"./x64-core":80}],56:[function(require,module,exports){
+},{"./aes":48,"./cipher-core":49,"./core":50,"./enc-base64":51,"./enc-utf16":52,"./evpkdf":53,"./format-hex":54,"./hmac":55,"./lib-typedarrays":57,"./md5":58,"./mode-cfb":59,"./mode-ctr":61,"./mode-ctr-gladman":60,"./mode-ecb":62,"./mode-ofb":63,"./pad-ansix923":64,"./pad-iso10126":65,"./pad-iso97971":66,"./pad-nopadding":67,"./pad-zeropadding":68,"./pbkdf2":69,"./rabbit":71,"./rabbit-legacy":70,"./rc4":72,"./ripemd160":73,"./sha1":74,"./sha224":75,"./sha256":76,"./sha3":77,"./sha384":78,"./sha512":79,"./tripledes":80,"./x64-core":81}],57:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8726,7 +8806,7 @@ module.exports = transfer;
 	return CryptoJS.lib.WordArray;
 
 }));
-},{"./core":49}],57:[function(require,module,exports){
+},{"./core":50}],58:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -8995,7 +9075,7 @@ module.exports = transfer;
 	return CryptoJS.MD5;
 
 }));
-},{"./core":49}],58:[function(require,module,exports){
+},{"./core":50}],59:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9074,7 +9154,7 @@ module.exports = transfer;
 	return CryptoJS.mode.CFB;
 
 }));
-},{"./cipher-core":48,"./core":49}],59:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],60:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9191,7 +9271,7 @@ module.exports = transfer;
 	return CryptoJS.mode.CTRGladman;
 
 }));
-},{"./cipher-core":48,"./core":49}],60:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],61:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9250,7 +9330,7 @@ module.exports = transfer;
 	return CryptoJS.mode.CTR;
 
 }));
-},{"./cipher-core":48,"./core":49}],61:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],62:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9291,7 +9371,7 @@ module.exports = transfer;
 	return CryptoJS.mode.ECB;
 
 }));
-},{"./cipher-core":48,"./core":49}],62:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],63:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9346,7 +9426,7 @@ module.exports = transfer;
 	return CryptoJS.mode.OFB;
 
 }));
-},{"./cipher-core":48,"./core":49}],63:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],64:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9396,7 +9476,7 @@ module.exports = transfer;
 	return CryptoJS.pad.Ansix923;
 
 }));
-},{"./cipher-core":48,"./core":49}],64:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],65:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9441,7 +9521,7 @@ module.exports = transfer;
 	return CryptoJS.pad.Iso10126;
 
 }));
-},{"./cipher-core":48,"./core":49}],65:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],66:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9482,7 +9562,7 @@ module.exports = transfer;
 	return CryptoJS.pad.Iso97971;
 
 }));
-},{"./cipher-core":48,"./core":49}],66:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],67:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9513,7 +9593,7 @@ module.exports = transfer;
 	return CryptoJS.pad.NoPadding;
 
 }));
-},{"./cipher-core":48,"./core":49}],67:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],68:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9559,7 +9639,7 @@ module.exports = transfer;
 	return CryptoJS.pad.ZeroPadding;
 
 }));
-},{"./cipher-core":48,"./core":49}],68:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50}],69:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9705,7 +9785,7 @@ module.exports = transfer;
 	return CryptoJS.PBKDF2;
 
 }));
-},{"./core":49,"./hmac":54,"./sha1":73}],69:[function(require,module,exports){
+},{"./core":50,"./hmac":55,"./sha1":74}],70:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -9896,7 +9976,7 @@ module.exports = transfer;
 	return CryptoJS.RabbitLegacy;
 
 }));
-},{"./cipher-core":48,"./core":49,"./enc-base64":50,"./evpkdf":52,"./md5":57}],70:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50,"./enc-base64":51,"./evpkdf":53,"./md5":58}],71:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10089,7 +10169,7 @@ module.exports = transfer;
 	return CryptoJS.Rabbit;
 
 }));
-},{"./cipher-core":48,"./core":49,"./enc-base64":50,"./evpkdf":52,"./md5":57}],71:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50,"./enc-base64":51,"./evpkdf":53,"./md5":58}],72:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10229,7 +10309,7 @@ module.exports = transfer;
 	return CryptoJS.RC4;
 
 }));
-},{"./cipher-core":48,"./core":49,"./enc-base64":50,"./evpkdf":52,"./md5":57}],72:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50,"./enc-base64":51,"./evpkdf":53,"./md5":58}],73:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10497,7 +10577,7 @@ module.exports = transfer;
 	return CryptoJS.RIPEMD160;
 
 }));
-},{"./core":49}],73:[function(require,module,exports){
+},{"./core":50}],74:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10648,7 +10728,7 @@ module.exports = transfer;
 	return CryptoJS.SHA1;
 
 }));
-},{"./core":49}],74:[function(require,module,exports){
+},{"./core":50}],75:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10729,7 +10809,7 @@ module.exports = transfer;
 	return CryptoJS.SHA224;
 
 }));
-},{"./core":49,"./sha256":75}],75:[function(require,module,exports){
+},{"./core":50,"./sha256":76}],76:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -10929,7 +11009,7 @@ module.exports = transfer;
 	return CryptoJS.SHA256;
 
 }));
-},{"./core":49}],76:[function(require,module,exports){
+},{"./core":50}],77:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -11253,7 +11333,7 @@ module.exports = transfer;
 	return CryptoJS.SHA3;
 
 }));
-},{"./core":49,"./x64-core":80}],77:[function(require,module,exports){
+},{"./core":50,"./x64-core":81}],78:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -11337,7 +11417,7 @@ module.exports = transfer;
 	return CryptoJS.SHA384;
 
 }));
-},{"./core":49,"./sha512":78,"./x64-core":80}],78:[function(require,module,exports){
+},{"./core":50,"./sha512":79,"./x64-core":81}],79:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -11661,7 +11741,7 @@ module.exports = transfer;
 	return CryptoJS.SHA512;
 
 }));
-},{"./core":49,"./x64-core":80}],79:[function(require,module,exports){
+},{"./core":50,"./x64-core":81}],80:[function(require,module,exports){
 ;(function (root, factory, undef) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -12432,7 +12512,7 @@ module.exports = transfer;
 	return CryptoJS.TripleDES;
 
 }));
-},{"./cipher-core":48,"./core":49,"./enc-base64":50,"./evpkdf":52,"./md5":57}],80:[function(require,module,exports){
+},{"./cipher-core":49,"./core":50,"./enc-base64":51,"./evpkdf":53,"./md5":58}],81:[function(require,module,exports){
 ;(function (root, factory) {
 	if (typeof exports === "object") {
 		// CommonJS
@@ -12737,7 +12817,7 @@ module.exports = transfer;
 	return CryptoJS;
 
 }));
-},{"./core":49}],81:[function(require,module,exports){
+},{"./core":50}],82:[function(require,module,exports){
 /*! https://mths.be/utf8js v2.0.0 by @mathias */
 ;(function(root) {
 
@@ -13010,5 +13090,5 @@ if (typeof window !== 'undefined' && typeof window.web3 === 'undefined') {
 module.exports = web3;
 
 
-},{"./lib/web3":22,"./lib/web3/contract":25,"./lib/web3/httpprovider":31,"./lib/web3/iban":32,"./lib/web3/ipcprovider":33,"./lib/web3/namereg":41,"./lib/web3/transfer":45}]},{},["web3"])
+},{"./lib/web3":22,"./lib/web3/contract":25,"./lib/web3/httpprovider":31,"./lib/web3/iban":32,"./lib/web3/ipcprovider":33,"./lib/web3/namereg":42,"./lib/web3/transfer":46}]},{},["web3"])
 //# sourceMappingURL=web3-light.js.map
