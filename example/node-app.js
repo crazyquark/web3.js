@@ -13,9 +13,12 @@ console.log(balance.toString(10));
 var privateKey = web3.personal.getAccountPrivateKey(coinbase, "mypass");
 console.log(privateKey);
 
-console.log("Trying to unlock remotely ... ")
+console.log("Trying to unlock remotely ... ");
 console.log(web3.personal.unlockAccount(coinbase, "mypass"));
 
-console.log("Creating new account with passphrase test...")
+console.log("Creating new account with passphrase test...");
 console.log(web3.personal.newAccount("test"));
+
+console.log("Trying to stop miner " + web3.miner.stop());
+console.log("Trying to start miner with one thread " + web3.miner.start(1));
 
